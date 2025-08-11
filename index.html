@@ -1,169 +1,271 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fanto - Jogo Educativo</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
-        
-        body {
-            background-color: #1a1a2e;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .header {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 500px;
-            margin-bottom: 20px;
-        }
-        
-        .balance {
-            background-color: #16213e;
-            padding: 10px 15px;
-            border-radius: 10px;
-            font-weight: bold;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .balance-label {
-            font-size: 12px;
-            color: #a8a8a8;
-        }
-        
-        .balance-amount {
-            font-size: 18px;
-            color: #f9c80e;
-        }
-        
-        .game-container {
-            background-color: #0f3460;
-            border-radius: 15px;
-            padding: 20px;
-            width: 100%;
-            max-width: 500px;
-            text-align: center;
-        }
-        
-        .timer {
-            font-size: 24px;
-            margin-bottom: 20px;
-            color: #e94560;
-        }
-        
-        .bet-display {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-        }
-        
-        .bet-amount {
-            background-color: #16213e;
-            padding: 10px;
-            border-radius: 8px;
-            min-width: 80px;
-        }
-        
-        .bet-label {
-            font-size: 12px;
-            color: #a8a8a8;
-        }
-        
-        .bet-value {
-            font-size: 16px;
-            color: white;
-        }
-        
-        .buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        
-        .btn-primary {
-            background-color: #e94560;
-            color: white;
-        }
-        
-        .btn-secondary {
-            background-color: #f9c80e;
-            color: #1a1a2e;
-        }
-        
-        .disclaimer {
-            margin-top: 30px;
-            font-size: 10px;
-            color: #a8a8a8;
-            text-align: center;
-            max-width: 500px;
-        }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <div class="balance">
-            <span class="balance-label">SALDO</span>
-            <span class="balance-amount">R$40.00</span>
-        </div>
-        <div class="balance">
-            <span class="balance-label">BÔNUS</span>
-            <span class="balance-amount">R$328,32</span>
-        </div>
-    </div>
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class FantoGame extends JFrame {
+    private double saldo = 40.00;
+    private double bonus = 328.32;
+    private double aposta = 0.50;
+    private double ganhoPotencial = 40.00;
+    private int tempo = 30;
+    private boolean jogoRodando = false;
     
-    <div class="game-container">
-        <div class="timer">0:30</div>
-        
-        <!-- Área do jogo seria implementada aqui -->
-        <div style="height: 200px; background-color: #16213e; border-radius: 10px; display: flex; justify-content: center; align-items: center;">
-            <p>ÁREA DO JOGO EDUCATIVO</p>
-        </div>
-        
-        <div class="bet-display">
-            <div class="bet-amount">
-                <div class="bet-label">APOSTA</div>
-                <div class="bet-value">R$0.50</div>
-            </div>
-            <div class="bet-amount">
-                <div class="bet-label">GANHO POTENCIAL</div>
-                <div class="bet-value">R$40.00</div>
-            </div>
-        </div>
-        
-        <div class="buttons">
-            <button class="btn btn-secondary">ALTERAR APOSTA</button>
-            <button class="btn btn-primary">JOGAR</button>
-        </div>
-    </div>
+    private JLabel saldoLabel, bonusLabel, timerLabel;
+    private JLabel apostaLabel, ganhoLabel;
+    private JButton alterarApostaBtn, jogarBtn;
+    private JPanel gamePanel;
     
-    <div class="disclaimer">
-        ESTE É UM PROJETO EDUCATIVO SOBRE DESENVOLVIMENTO WEB. NÃO É UM SITE REAL DE APOSTAS.
-        <br><br>
-        O JOGO DE APOSTAS É PROIBIDO PARA MENORES DE 18 ANOS. JOGUE COM RESPONSABILIDADE.
-        <br><br>
-        EM CASO DE PROBLEMAS, LIGUE PARA 0800 722 1133 (VIVAVOZ - JOGO RESPONSÁVEL)
-    </div>
-</body>
-</html>
+    public FantoGame() {
+        setTitle("Fanto - Jogo Educativo");
+        setSize(500, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setResizable(false);
+        getContentPane().setBackground(new Color(26, 26, 46));
+        
+        initUI();
+        
+        // Timer para contagem regressiva
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (jogoRodando && tempo > 0) {
+                    tempo--;
+                    SwingUtilities.invokeLater(() -> {
+                        timerLabel.setText(String.format("%d", tempo));
+                        if (tempo == 0) {
+                            fimDoJogo();
+                        }
+                    });
+                }
+            }
+        }, 1000, 1000);
+    }
+    
+    private void initUI() {
+        // Painel superior com saldo e bônus
+        JPanel headerPanel = new JPanel(new GridLayout(1, 2, 10, 0));
+        headerPanel.setBackground(new Color(26, 26, 46));
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
+        saldoLabel = createBalancePanel("SALDO", String.format("R$%.2f", saldo), new Color(22, 33, 62));
+        bonusLabel = createBalancePanel("BÔNUS", String.format("R$%.2f", bonus), new Color(22, 33, 62));
+        
+        headerPanel.add(saldoLabel);
+        headerPanel.add(bonusLabel);
+        
+        // Painel do jogo
+        gamePanel = new JPanel(new BorderLayout());
+        gamePanel.setBackground(new Color(15, 52, 96));
+        gamePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
+        // Timer
+        timerLabel = new JLabel("30", SwingConstants.CENTER);
+        timerLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        timerLabel.setForeground(new Color(233, 69, 96));
+        gamePanel.add(timerLabel, BorderLayout.NORTH);
+        
+        // Área central do jogo
+        JPanel centerPanel = new JPanel();
+        centerPanel.setBackground(new Color(22, 33, 62));
+        centerPanel.setPreferredSize(new Dimension(400, 200));
+        centerPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+        centerPanel.add(new JLabel("ÁREA DO JOGO EDUCATIVO"));
+        gamePanel.add(centerPanel, BorderLayout.CENTER);
+        
+        // Painel de apostas
+        JPanel betPanel = new JPanel(new GridLayout(1, 2, 10, 0));
+        betPanel.setBackground(new Color(15, 52, 96));
+        
+        apostaLabel = createBetPanel("APOSTA", String.format("R$%.2f", aposta));
+        ganhoLabel = createBetPanel("GANHO POTENCIAL", String.format("R$%.2f", ganhoPotencial));
+        
+        betPanel.add(apostaLabel);
+        betPanel.add(ganhoLabel);
+        gamePanel.add(betPanel, BorderLayout.SOUTH);
+        
+        // Painel de botões
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 10, 0));
+        buttonPanel.setBackground(new Color(15, 52, 96));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 0, 20));
+        
+        alterarApostaBtn = new JButton("ALTERAR APOSTA");
+        styleButton(alterarApostaBtn, new Color(249, 200, 14), Color.BLACK);
+        alterarApostaBtn.addActionListener(e -> alterarAposta());
+        
+        jogarBtn = new JButton("JOGAR");
+        styleButton(jogarBtn, new Color(233, 69, 96), Color.WHITE);
+        jogarBtn.addActionListener(e -> iniciarJogo());
+        
+        buttonPanel.add(alterarApostaBtn);
+        buttonPanel.add(jogarBtn);
+        
+        // Disclaimer
+        JTextArea disclaimer = new JTextArea();
+        disclaimer.setText("ESTE É UM PROJETO EDUCATIVO SOBRE DESENVOLVIMENTO DE SOFTWARE. NÃO É UM JOGO REAL DE APOSTAS.\n\n" +
+                         "O JOGO DE APOSTAS É PROIBIDO PARA MENORES DE 18 ANOS. JOGUE COM RESPONSABILIDADE.\n\n" +
+                         "EM CASO DE PROBLEMAS, LIGUE PARA 0800 722 1133 (VIVAVOZ - JOGO RESPONSÁVEL)");
+        disclaimer.setEditable(false);
+        disclaimer.setLineWrap(true);
+        disclaimer.setWrapStyleWord(true);
+        disclaimer.setBackground(new Color(26, 26, 46));
+        disclaimer.setForeground(Color.GRAY);
+        disclaimer.setFont(new Font("Arial", Font.PLAIN, 10));
+        disclaimer.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
+        // Layout principal
+        setLayout(new BorderLayout());
+        add(headerPanel, BorderLayout.NORTH);
+        add(gamePanel, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
+        add(disclaimer, BorderLayout.PAGE_END);
+    }
+    
+    private JLabel createBalancePanel(String title, String value, Color bgColor) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(bgColor);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+        
+        JLabel titleLabel = new JLabel(title, SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        titleLabel.setForeground(Color.GRAY);
+        
+        JLabel valueLabel = new JLabel(value, SwingConstants.CENTER);
+        valueLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        valueLabel.setForeground(new Color(249, 200, 14));
+        
+        panel.add(titleLabel, BorderLayout.NORTH);
+        panel.add(valueLabel, BorderLayout.CENTER);
+        
+        JLabel container = new JLabel();
+        container.setLayout(new BorderLayout());
+        container.add(panel);
+        return container;
+    }
+    
+    private JLabel createBetPanel(String title, String value) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(new Color(22, 33, 62));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        JLabel titleLabel = new JLabel(title, SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        titleLabel.setForeground(Color.GRAY);
+        
+        JLabel valueLabel = new JLabel(value, SwingConstants.CENTER);
+        valueLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        valueLabel.setForeground(Color.WHITE);
+        
+        panel.add(titleLabel, BorderLayout.NORTH);
+        panel.add(valueLabel, BorderLayout.CENTER);
+        
+        JLabel container = new JLabel();
+        container.setLayout(new BorderLayout());
+        container.add(panel);
+        return container;
+    }
+    
+    private void styleButton(JButton button, Color bgColor, Color textColor) {
+        button.setBackground(bgColor);
+        button.setForeground(textColor);
+        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    }
+    
+    private void alterarAposta() {
+        if (jogoRodando) {
+            JOptionPane.showMessageDialog(this, "Você não pode alterar a aposta durante o jogo!", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        String input = JOptionPane.showInputDialog(this, "Digite o valor da nova aposta:", aposta);
+        try {
+            double novaAposta = Double.parseDouble(input);
+            if (novaAposta <= 0) {
+                throw new NumberFormatException();
+            }
+            
+            if (novaAposta > saldo) {
+                JOptionPane.showMessageDialog(this, "Saldo insuficiente para esta aposta!", "Erro", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            aposta = novaAposta;
+            ganhoPotencial = aposta * 80; // Multiplicador fictício para fins educativos
+            atualizarUI();
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Valor inválido! Digite um número positivo.", "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void iniciarJogo() {
+        if (jogoRodando) {
+            JOptionPane.showMessageDialog(this, "O jogo já está em andamento!", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        if (aposta > saldo) {
+            JOptionPane.showMessageDialog(this, "Saldo insuficiente para esta aposta!", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        saldo -= aposta;
+        jogoRodando = true;
+        tempo = 30;
+        timerLabel.setText("30");
+        jogarBtn.setEnabled(false);
+        alterarApostaBtn.setEnabled(false);
+        
+        // Simulação de jogo rodando
+        new Thread(() -> {
+            try {
+                Thread.sleep(15000); // Jogo dura 15 segundos (para demonstração)
+                SwingUtilities.invokeLater(this::fimDoJogo);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+    
+    private void fimDoJogo() {
+        jogoRodando = false;
+        tempo = 0;
+        timerLabel.setText("0");
+        jogarBtn.setEnabled(true);
+        alterarApostaBtn.setEnabled(true);
+        
+        // Resultado aleatório (50% de chance de ganhar)
+        boolean ganhou = Math.random() > 0.5;
+        
+        if (ganhou) {
+            saldo += ganhoPotencial;
+            JOptionPane.showMessageDialog(this, 
+                String.format("Parabéns! Você ganhou R$%.2f!", ganhoPotencial), 
+                "Vitória", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, 
+                "Que pena! Você perdeu desta vez. Tente novamente!", 
+                "Derrota", JOptionPane.INFORMATION_MESSAGE);
+        }
+        
+        atualizarUI();
+    }
+    
+    private void atualizarUI() {
+        saldoLabel.setText(String.format("<html><div style='text-align: center;'>SALDO<br/><span style='font-size: 18px; color: #f9c80e;'>R$%.2f</span></div></html>", saldo));
+        bonusLabel.setText(String.format("<html><div style='text-align: center;'>BÔNUS<br/><span style='font-size: 18px; color: #f9c80e;'>R$%.2f</span></div></html>", bonus));
+        apostaLabel.setText(String.format("<html><div style='text-align: center;'>APOSTA<br/><span style='font-size: 16px; color: white;'>R$%.2f</span></div></html>", aposta));
+        ganhoLabel.setText(String.format("<html><div style='text-align: center;'>GANHO POTENCIAL<br/><span style='font-size: 16px; color: white;'>R$%.2f</span></div></html>", ganhoPotencial));
+    }
+    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            FantoGame game = new FantoGame();
+            game.setVisible(true);
+        });
+    }
+}
