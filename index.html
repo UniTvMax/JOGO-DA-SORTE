@@ -1,70 +1,81 @@
-<!doctype html>
-<html lang="pt-BR">
+<!DOCTYPE html><html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Slot Inspirado — Jogo da Sorte</title>
-  <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Slot Original</title>
+<style>
+  body {
+    background: linear-gradient(#0a0a0a, #1a1a1a);
+    color: #fff;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  .slot-machine {
+    background: #222;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 0 15px #ffcc00;
+    text-align: center;
+    width: 300px;
+  }
+  .reels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+  }
+  .reel {
+    width: 80px;
+    height: 80px;
+    background: #000;
+    border: 2px solid #ffcc00;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+  }
+  .controls button {
+    padding: 10px;
+    margin: 5px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .fast {
+    background: #ff4444;
+    color: white;
+  }
+  .normal {
+    background: #44ff44;
+    color: black;
+  }
+</style>
 </head>
 <body>
-  <main class="wrap">
-    <header>
-      <h1>🎰 Slot Inspirado — Jogo da Sorte</h1>
-      <p class="hint">Versão educativa: aparência familiar, visuais originais e tudo funcional.</p>
-    </header>
+<div class="slot-machine">
+  <div class="reels">
+    <div class="reel" id="reel1">🍒</div>
+    <div class="reel" id="reel2">🍋</div>
+    <div class="reel" id="reel3">🍉</div>
+  </div>
+  <div class="controls">
+    <button class="fast" onclick="spinFast()">Rápido</button>
+    <button class="normal" onclick="spinNormal()">Normal</button>
+  </div>
+  <p>Saldo: <span id="saldo">1000</span> moedas</p>
+</div>
+<script>
+  let saldo = 1000;
+  let fastCount = 0;function spin(reels, fast) { const symbols = ["🍒", "🍋", "🍉", "⭐", "🐯"]; if (fast) { fastCount++; if (fastCount >= 3) { fastCount = 0; document.getElementById('reel1').textContent = "🐯"; document.getElementById('reel2').textContent = "🐯"; document.getElementById('reel3').textContent = "🐯"; saldo += 500; document.getElementById('saldo').textContent = saldo; return; } } for (let i = 0; i < reels.length; i++) { const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)]; reels[i].textContent = randomSymbol; } saldo -= 10; document.getElementById('saldo').textContent = saldo; }
 
-    <section class="slot-panel">
-      <div class="reel-area" aria-hidden="false">
-        <!-- 3x3 grid -->
-        <div class="grid" id="grid">
-          <!-- cells inserted by JS -->
-        </div>
+function spinFast() { spin([document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')], true); }
 
-        <div class="payline"></div>
-      </div>
+function spinNormal() { spin([document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')], false); } </script>
 
-      <div class="controls">
-        <div class="top-row">
-          <div class="balance" id="balance">💰 Saldo: R$100.00</div>
-          <div class="bet">
-            <button id="betDown" title="Diminuir aposta">−</button>
-            <div>🪙 Aposta: <span id="betValue">R$0.50</span></div>
-            <button id="betUp" title="Aumentar aposta">+</button>
-          </div>
-          <div class="win" id="lastWin">Ganho: R$0,00</div>
-        </div>
-
-        <div class="buttons">
-          <button id="btnSpin" class="spin">▶︎ GIRAR</button>
-          <button id="btnAuto" class="auto">AUTO</button>
-          <button id="btnExport" class="export">Exportar CSV</button>
-        </div>
-
-        <div class="info">
-          <div id="message">Clique em GIRAR para começar.</div>
-          <div id="probabilities" class="muted">Probabilidades: 3 iguais = raro, 2 iguais = comum.</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="paytable">
-      <h2>Tabela de Pagamentos (por aposta)</h2>
-      <table>
-        <thead><tr><th>Símbolo</th><th>3x (payout)</th><th>2x (payout)</th></tr></thead>
-        <tbody>
-          <tr><td>⭐ Estrela</td><td>x12</td><td>x2</td></tr>
-          <tr><td>🍀 Trevo</td><td>x8</td><td>x1.5</td></tr>
-          <tr><td>🔔 Sino</td><td>x5</td><td>x1</td></tr>
-          <tr><td>💎 Joia</td><td>x20</td><td>x3</td></tr>
-          <tr><td>🐯 Tigre Genérico</td><td>x50</td><td>-</td></tr>
-        </tbody>
-      </table>
-      <p class="muted small">Saldo inicial padrão: R$100, aposta inicial: R$0,50. Linha de pagamento: linha central (1 payline).</p>
-    </section>
-
-    <footer class="muted small">Criado para trabalho escolar — visuais originais.</footer>
-  </main>
-
-  <script src="script.js" defer></script>
 </body>
 </html>
